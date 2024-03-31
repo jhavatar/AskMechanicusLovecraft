@@ -1,0 +1,80 @@
+plugins {
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+}
+
+android {
+    namespace 'io.chthonic.mechanicuslovecraft.presentation'
+    compileSdk versions.targetSdk
+
+    defaultConfig {
+        minSdk versions.minSdk
+        targetSdk versions.targetSdk
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    compileOptions {
+        sourceCompatibility versions.java
+        targetCompatibility versions.java
+    }
+    kotlinOptions {
+        jvmTarget = versions.jvm_target
+    }
+    viewBinding {
+        enabled = true
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = versions.kotlin_compiler_ext
+    }
+}
+
+dependencies {
+    implementation libs.androidx.core
+    implementation project(path: ':domain:presentationapi')
+
+    // di
+    implementation libs.hilt.android
+    ksp libs.hilt.android.compiler
+    implementation libs.hilt.navigation.compose
+
+    // compose
+    implementation libs.compose
+    implementation libs.compose.material
+    implementation libs.compose.tooling.preview
+    implementation libs.compose.constraintlayout
+    debugImplementation libs.compose.tooling
+
+    // navigation
+    implementation libs.navigation
+    implementation libs.navigation.compose
+
+    // viewModel
+    implementation libs.viewmodel
+    implementation libs.viewmodel.compose
+    implementation libs.viewmodel.runtime
+
+    // coroutines, flow
+    implementation libs.coroutines.core
+    implementation libs.coroutines.android
+
+    // image
+    implementation libs.coil
+    implementation libs.coil.compose
+
+    // paging
+    implementation libs.paging.runtime
+    implementation libs.paging.compose
+
+    // logging
+    implementation libs.timber
+
+    // testing
+    testImplementation libs.junit
+}

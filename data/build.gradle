@@ -1,0 +1,32 @@
+plugins {
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+}
+
+android {
+    namespace 'io.chthonic.mechanicuslovecraft.data'
+    compileSdk versions.targetSdk
+
+    defaultConfig {
+        minSdk versions.minSdk
+        targetSdk versions.targetSdk
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    compileOptions {
+        sourceCompatibility versions.java
+        targetCompatibility versions.java
+    }
+    kotlinOptions {
+        jvmTarget = versions.jvm_target
+    }
+}
+
+dependencies {
+    implementation libs.androidx.core
+
+    // testing
+    testImplementation libs.junit
+}

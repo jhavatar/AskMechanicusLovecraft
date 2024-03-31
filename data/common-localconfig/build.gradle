@@ -1,0 +1,42 @@
+plugins {
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+}
+
+android {
+    namespace 'io.chthonic.mechanicuslovecraft.data.localconfig'
+    compileSdk versions.targetSdk
+
+    defaultConfig {
+        minSdk versions.minSdk
+        targetSdk versions.targetSdk
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+    compileOptions {
+        sourceCompatibility versions.java
+        targetCompatibility versions.java
+    }
+    kotlinOptions {
+        jvmTarget = versions.jvm_target
+    }
+}
+
+dependencies {
+    implementation libs.androidx.core
+    implementation project(path: ':data:common')
+    implementation project(path: ':domain:dataapi')
+
+    // settings
+    implementation libs.tweaks
+
+    // di
+    implementation libs.hilt.android
+    ksp libs.hilt.android.compiler
+
+    // test
+    testImplementation libs.junit
+}

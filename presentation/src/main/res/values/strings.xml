@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Ask Mechanicus Lovecraft</string>
+    <string name="input_hint">enter command</string>
+</resources>

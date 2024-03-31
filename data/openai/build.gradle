@@ -1,0 +1,58 @@
+plugins {
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+}
+
+android {
+    namespace 'io.chthonic.mechanicuslovecraft.data.openai'
+    compileSdk versions.targetSdk
+
+    defaultConfig {
+        minSdk versions.minSdk
+        targetSdk versions.targetSdk
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+    compileOptions {
+        sourceCompatibility versions.java
+        targetCompatibility versions.java
+    }
+    kotlinOptions {
+        jvmTarget = versions.jvm_target
+    }
+}
+
+dependencies {
+    implementation libs.androidx.core
+    implementation project(path: ':data:common')
+    implementation project(path: ':domain:dataapi')
+
+    // coroutines, flow
+    implementation libs.coroutines.core
+    implementation libs.coroutines.android
+
+    // json
+    implementation libs.moshi.adapters
+    implementation libs.moshi.kotlin
+    implementation libs.moshi.kotlin.codegen
+    implementation libs.moshi
+
+    // di
+    implementation libs.hilt.android
+    ksp libs.hilt.android.compiler
+
+    // net
+    implementation libs.okhttp
+    implementation libs.okhttp.logging.interceptor
+    implementation libs.okhttp.sse
+
+    // rest
+    implementation libs.retrofit.converter.moshi
+    implementation libs.retrofit
+
+    // test
+    testImplementation libs.junit
+}
