@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace 'io.chthonic.mechanicuslovecraft.data.common'
+    namespace 'io.chthonic.mechanicuslovecraft.common'
     compileSdk versions.targetSdk
 
     defaultConfig {
@@ -26,30 +26,14 @@ android {
 }
 
 dependencies {
-    api project(path: ':common')
     implementation libs.androidx.core
-
-    // coroutines, flow
-    implementation libs.coroutines.core
-    implementation libs.coroutines.android
-
-    // json
-    implementation libs.moshi.adapters
-    implementation libs.moshi.kotlin
-    implementation libs.moshi.kotlin.codegen
-    implementation libs.moshi
+    testImplementation libs.junit
 
     // di
     implementation libs.hilt.android
     ksp libs.hilt.android.compiler
 
-    // net
-    implementation libs.okhttp
-    implementation libs.okhttp.logging.interceptor
-
-    // logging
-    api libs.timber
-
-    // testing
-    testImplementation libs.junit
+    // coroutines, flow
+    implementation libs.coroutines.core
+    implementation libs.coroutines.android
 }

@@ -3,11 +3,10 @@ package io.chthonic.mechanicuslovecraft.presentation.console
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.chthonic.mechanicuslovecraft.domain.presentationapi.openai.TestOpenAiUseCase
+import io.chthonic.mechanicuslovecraft.domain.ObserveStreamingResponseToMessageUseCase
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.models.InputString
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import io.chthonic.mechanicuslovecraft.domain.presentationapi.openai.TestOpenAiUseCase
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,12 +21,17 @@ private const val COLOR_NON_ERROR = "#9FFF99"
 @HiltViewModel
 internal class ConsoleViewModel constructor(
     private val testOpenAiUseCase: TestOpenAiUseCase,
+    private val observeStreamingResponseToMessageUseCase: ObserveStreamingResponseToMessageUseCase,
     initStateState: State,
 ) : ViewModel() {
 
     @Inject
-    constructor(testOpenAiUseCase: TestOpenAiUseCase) : this(
+    constructor(
+        testOpenAiUseCase: TestOpenAiUseCase,
+        observeStreamingResponseToMessageUseCase: ObserveStreamingResponseToMessageUseCase,
+    ) : this(
         testOpenAiUseCase,
+        observeStreamingResponseToMessageUseCase,
         State(),
     )
 
@@ -64,8 +68,38 @@ internal class ConsoleViewModel constructor(
     }
 
     private fun executeCommandLineInput(input: InputString) {
+        val currentSate = state.value
+        val history = currentSate.history
+        _state.value = currentSate.copy(
+            history = history.append(HistoryItem.OutputHistory(text = "", isError = false))
+        )
         viewModelScope.launch {
-            testOpenAiUseCase.execute()
+            observeStreamingResponseToMessageUseCase.execute(input)
+                .catch { error ->
+                    _state.value = state.value.copy(
+                        inputSubmitEnabled = true,
+                        history = history.append(
+                            HistoryItem.OutputHistory(
+                                text = error.message ?: error.toString(),
+                                isError = true
+                            )
+                        )
+                    )
+                }.onCompletion {
+                    _state.value = state.value.copy(
+                        inputSubmitEnabled = true,
+                    )
+                }.collect { text ->
+                    _state.value = state.value.copy(
+                        history = history.append(
+                            HistoryItem.OutputHistory(
+                                text = text,
+                                isError = false
+                            )
+                        )
+                    )
+                }
+
 //            val history = state.value.history
 //            val updatedHistory = try {
 //                executeCommandLineInputUseCase.execute(input)?.let {

@@ -4,6 +4,6 @@ import androidx.annotation.Keep
 
 @Keep
 internal data class Message(
-    val role: String,
+    val role: Role,
     val content: String,
 )

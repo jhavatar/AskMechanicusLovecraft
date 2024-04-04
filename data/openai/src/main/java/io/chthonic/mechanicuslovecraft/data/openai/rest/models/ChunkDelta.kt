@@ -5,5 +5,5 @@ import androidx.annotation.Keep
 @Keep
 internal data class ChunkDelta(
     val content: String?,
-    val role: String?,
+    val role: Role?,
 )

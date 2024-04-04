@@ -13,7 +13,7 @@ internal class ModelJsonAdapter : JsonAdapter<Model>() {
         }
 
     @ToJson
-    override fun toJson(writer: JsonWriter, value: Model?) {
-        writer.value(value?.value)
+    override fun toJson(writer: JsonWriter, model: Model?) {
+        writer.value(model?.value)
     }
 }

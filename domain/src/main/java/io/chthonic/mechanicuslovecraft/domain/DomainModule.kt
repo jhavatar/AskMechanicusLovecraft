@@ -13,4 +13,9 @@ internal class DomainModule {
 
     @Provides
     fun provideTestOpenAi(impl: TestOpenAiUseCaseImpl): TestOpenAiUseCase = impl
+
+    @Provides
+    fun provideObserveStreamingResponseToMessageUseCase(
+        impl: ObserveStreamingResponseToMessageUseCaseImpl
+    ): ObserveStreamingResponseToMessageUseCase = impl
 }
