@@ -8,7 +8,6 @@ import io.chthonic.mechanicuslovecraft.data.openai.rest.models.*
 import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.OpenAiService
 import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.models.ChatMessageChunk
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -47,13 +46,10 @@ internal class OpenAiServiceImpl @Inject constructor(
     }
 
     override suspend fun testStreamChatResponse() {
-        GlobalScope.launch {
+        coroutineScope.launch {
             streamChatResponse(
-                ChatRequest(
-                    messages = listOf(
-                        Message(role = Role.USER, content = "Say this is a test!")
-                    ),
-                    model = Model.GPT35_TURBO,
+                buildChatRequest(
+                    content = "Say this is a test!",
                     stream = true,
                 )
             ).collect {
@@ -62,25 +58,40 @@ internal class OpenAiServiceImpl @Inject constructor(
         }
     }
 
-    private suspend fun getChatResponse(): ChatResponse =
-        openAiApi.getChatResponse(
-            ChatRequest(
-                messages = listOf(
-                    Message(role = Role.USER, content = "Say this is a test!")
-                ),
-                model = Model.GPT35_TURBO,
-            )
+    private fun buildChatRequest(
+        content: String,
+        systemMetaInfo: String? = null,
+        model: Model = Model.GPT35_TURBO,
+        stream: Boolean = false,
+    ): ChatRequest =
+        ChatRequest(
+            messages = listOf(
+                Message(role = Role.USER, content = content)
+            ) + (systemMetaInfo?.let {
+                listOf(
+                    Message(
+                        content = systemMetaInfo,
+                        role = Role.SYSTEM,
+                    )
+                )
+            } ?: emptyList()),
+            model = model,
+            stream = stream,
         )
 
-    override fun observeStreamingChatResponseToUserMessage(userMessage: String): Flow<ChatMessageChunk> {
+    private suspend fun getChatResponse(): ChatResponse =
+        openAiApi.getChatResponse(buildChatRequest("Say this is a test!"))
+
+    override fun observeStreamingChatResponseToUserMessage(
+        userMessage: String,
+        systemMetaInfo: String?
+    ): Flow<ChatMessageChunk> {
         var responseRole = Role.ASSISTANT
         return streamChatResponse(
-            ChatRequest(
-                messages = listOf(
-                    Message(role = Role.USER, content = userMessage)
-                ),
-                model = Model.GPT35_TURBO,
-                stream = true,
+            buildChatRequest(
+                content = userMessage,
+                systemMetaInfo = systemMetaInfo,
+                stream = true
             )
         ).mapNotNull { chunk ->
             chunk.choices.firstOrNull()?.delta?.let { delta ->

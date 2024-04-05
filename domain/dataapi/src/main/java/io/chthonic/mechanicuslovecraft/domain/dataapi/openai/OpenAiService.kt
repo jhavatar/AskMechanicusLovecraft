@@ -7,5 +7,8 @@ interface OpenAiService {
     suspend fun testChatResponse()
     suspend fun testStreamChatResponse()
 
-    fun observeStreamingChatResponseToUserMessage(userMessage: String): Flow<ChatMessageChunk>
+    fun observeStreamingChatResponseToUserMessage(
+        userMessage: String,
+        systemMetaInfo: String? = null
+    ): Flow<ChatMessageChunk>
 }
