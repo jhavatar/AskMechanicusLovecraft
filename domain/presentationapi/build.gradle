@@ -26,6 +26,7 @@ android {
 
 dependencies {
     implementation libs.androidx.core
+    implementation project(path: ':common')
 
     // paging
     implementation libs.paging.runtime

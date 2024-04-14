@@ -1,4 +1,4 @@
-package io.chthonic.mechanicuslovecraft.domain
+package io.chthonic.mechanicuslovecraft.domain.presentationapi
 
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.models.InputString
 import kotlinx.coroutines.flow.Flow

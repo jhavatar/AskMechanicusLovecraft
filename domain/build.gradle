@@ -28,6 +28,7 @@ android {
 
 dependencies {
     implementation libs.androidx.core
+    implementation project(path: ':common')
     implementation project(path: ':domain:dataapi')
     implementation project(path: ':domain:presentationapi')
 

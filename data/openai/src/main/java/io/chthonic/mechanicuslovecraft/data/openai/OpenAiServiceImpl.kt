@@ -3,10 +3,12 @@ package io.chthonic.mechanicuslovecraft.data.openai
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import io.chthonic.mechanicuslovecraft.common.coroutines.CoroutineDispatcherProvider
+import io.chthonic.mechanicuslovecraft.common.valueobjects.Role
 import io.chthonic.mechanicuslovecraft.data.openai.rest.OpenAiApi
 import io.chthonic.mechanicuslovecraft.data.openai.rest.models.*
+import io.chthonic.mechanicuslovecraft.domain.dataapi.models.ChatMessage
 import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.OpenAiService
-import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.models.ChatMessageChunk
+import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.models.ChatResponseStreamChunk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
@@ -49,7 +51,7 @@ internal class OpenAiServiceImpl @Inject constructor(
         coroutineScope.launch {
             streamChatResponse(
                 buildChatRequest(
-                    content = "Say this is a test!",
+                    message = "Say this is a test!",
                     stream = true,
                 )
             ).collect {
@@ -59,37 +61,56 @@ internal class OpenAiServiceImpl @Inject constructor(
     }
 
     private fun buildChatRequest(
-        content: String,
+        message: String,
         systemMetaInfo: String? = null,
         model: Model = Model.GPT35_TURBO,
         stream: Boolean = false,
-    ): ChatRequest =
-        ChatRequest(
-            messages = listOf(
-                Message(role = Role.USER, content = content)
-            ) + (systemMetaInfo?.let {
-                listOf(
-                    Message(
-                        content = systemMetaInfo,
-                        role = Role.SYSTEM,
-                    )
+    ): ChatRequest = buildChatRequest(
+        messageHistory = listOf(
+            Message(
+                role = Role.User,
+                content = message,
+            )
+        ),
+        systemMetaInfo = systemMetaInfo,
+        model = model,
+        stream = stream,
+    )
+
+    private fun buildChatRequest(
+        messageHistory: List<Message>,
+        systemMetaInfo: String? = null,
+        model: Model = Model.GPT35_TURBO,
+        stream: Boolean = false,
+    ): ChatRequest = ChatRequest(
+        messages = messageHistory + (systemMetaInfo?.let {
+            listOf(
+                Message(
+                    content = systemMetaInfo,
+                    role = Role.System,
                 )
-            } ?: emptyList()),
-            model = model,
-            stream = stream,
-        )
+            )
+        } ?: emptyList()),
+        model = model,
+        stream = stream,
+    )
 
     private suspend fun getChatResponse(): ChatResponse =
         openAiApi.getChatResponse(buildChatRequest("Say this is a test!"))
 
-    override fun observeStreamingChatResponseToUserMessage(
-        userMessage: String,
-        systemMetaInfo: String?
-    ): Flow<ChatMessageChunk> {
-        var responseRole = Role.ASSISTANT
+    override fun observeStreamingResponseToChat(
+        messageHistory: List<ChatMessage>,
+        systemMetaInfo: String?,
+    ): Flow<ChatResponseStreamChunk> {
+        var responseRole: Role = Role.Assistant
         return streamChatResponse(
             buildChatRequest(
-                content = userMessage,
+                messageHistory = messageHistory.map {
+                    Message(
+                        role = it.role,
+                        content = it.content
+                    )
+                },
                 systemMetaInfo = systemMetaInfo,
                 stream = true
             )
@@ -97,11 +118,11 @@ internal class OpenAiServiceImpl @Inject constructor(
             chunk.choices.firstOrNull()?.delta?.let { delta ->
                 responseRole = delta.role ?: responseRole
                 delta.content?.let { content ->
-                    ChatMessageChunk(
+                    ChatResponseStreamChunk(
                         messageId = chunk.id,
                         content = content,
                         created = chunk.created,
-                        role = responseRole.value,
+                        role = responseRole,
                     )
                 }
             }

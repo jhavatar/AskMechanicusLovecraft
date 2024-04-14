@@ -1,14 +1,14 @@
 package io.chthonic.mechanicuslovecraft.presentation.ktx
 
-import androidx.compose.foundation.lazy.grid.LazyGridItemScope
-import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.paging.compose.LazyPagingItems
 
-inline fun <T : Any> LazyGridScope.items(
+inline fun <T : Any> LazyListScope.items(
     items: LazyPagingItems<T>,
     crossinline itemKey: ((item: T) -> Any?) = { null },
-    crossinline itemContent: @Composable LazyGridItemScope.(item: T?) -> Unit
+    crossinline itemContent: @Composable LazyItemScope.(item: T?) -> Unit
 ) {
     items(
         count = items.itemCount,
@@ -22,10 +22,10 @@ inline fun <T : Any> LazyGridScope.items(
     }
 }
 
-inline fun <T : Any> LazyGridScope.items(
+inline fun <T : Any> LazyListScope.items(
     items: List<T>,
     crossinline itemKey: ((item: T) -> Any?) = { null },
-    crossinline itemContent: @Composable LazyGridItemScope.(item: T?) -> Unit
+    crossinline itemContent: @Composable LazyItemScope.(item: T?) -> Unit
 ) {
     items(
         count = items.size,
@@ -38,4 +38,3 @@ inline fun <T : Any> LazyGridScope.items(
         itemContent(items[index])
     }
 }
-

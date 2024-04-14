@@ -4,7 +4,7 @@ androidx-core = '1.12.0'
 androidx-test-ext-junit = "1.1.5"
 appcompat = "1.6.1"
 coil = '2.5.0'
-compose = '1.6.4'
+compose = '1.6.5'
 compose_constraintlayout = '1.0.1'
 coroutines = '1.8.0'
 espresso-core = "3.5.1"
@@ -20,6 +20,7 @@ navigation = '2.7.7'
 okhttp = '4.12.0'
 paging = '3.2.1'
 retrofit = '2.10.0'
+realm = '1.14.1'
 room = '2.6.1'
 room-paging = '2.6.1'
 timber = '5.0.1'
@@ -73,6 +74,9 @@ compose-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", v
 compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-constraintlayout = { module= "androidx.constraintlayout:constraintlayout-compose", version.ref = "compose_constraintlayout"}
 
+# db
+realm-base = { module = "io.realm.kotlin:library-base", version.ref = "realm" }
+
 # navigation
 navigation = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
@@ -105,3 +109,4 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+realm = { id = "io.realm.kotlin", version.ref = "realm" }
