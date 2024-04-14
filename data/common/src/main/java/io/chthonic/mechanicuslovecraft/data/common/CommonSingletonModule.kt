@@ -6,6 +6,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.chthonic.mechanicuslovecraft.common.valueobjects.Role
+import io.chthonic.mechanicuslovecraft.data.common.json.RoleJsonAdapter
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
@@ -16,6 +18,7 @@ internal class CommonSingletonModule {
     @Provides
     @Singleton
     fun provideMoshi(): Moshi = Moshi.Builder()
+        .add(Role::class.java, RoleJsonAdapter())
         .addLast(KotlinJsonAdapterFactory())
         .build()
 

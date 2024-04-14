@@ -9,8 +9,6 @@ import io.chthonic.mechanicuslovecraft.data.openai.rest.OpenAiApi
 import io.chthonic.mechanicuslovecraft.data.openai.rest.OpenAiHeadersInterceptor
 import io.chthonic.mechanicuslovecraft.data.openai.rest.models.Model
 import io.chthonic.mechanicuslovecraft.data.openai.rest.models.ModelJsonAdapter
-import io.chthonic.mechanicuslovecraft.data.openai.rest.models.Role
-import io.chthonic.mechanicuslovecraft.data.openai.rest.models.RoleJsonAdapter
 import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.OpenAiService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -36,7 +34,6 @@ internal class OpenAiSingletonModule {
     @Named("moshi-openai")
     fun provideMoshiForOpenAi(moshi: Moshi): Moshi = moshi.newBuilder()
         .add(Model::class.java, ModelJsonAdapter())
-        .add(Role::class.java, RoleJsonAdapter())
         .build()
 
     @Provides

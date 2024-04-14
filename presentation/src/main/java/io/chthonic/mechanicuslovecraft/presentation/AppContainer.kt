@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import io.chthonic.mechanicuslovecraft.presentation.ktx.collectAsStateLifecycleAware
+import io.chthonic.mechanicuslovecraft.presentation.theme.DraculaPurple
 
 @Preview
 @Composable
@@ -27,7 +28,7 @@ fun AppContainer() {
                 initial = null,
                 scope = coroutineScope
             )
-            TopAppBar(title = { Text(appBarTitle.value ?: "") })
+            TopAppBar(title = { Text(appBarTitle.value ?: "", color = DraculaPurple) })
         },
         floatingActionButton = {
             // your floating action button

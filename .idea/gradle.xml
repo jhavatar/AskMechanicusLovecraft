@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/data" />
+            <option value="$PROJECT_DIR$/data/chat-repo-realm" />
             <option value="$PROJECT_DIR$/data/common" />
             <option value="$PROJECT_DIR$/data/common-localconfig" />
             <option value="$PROJECT_DIR$/data/openai" />

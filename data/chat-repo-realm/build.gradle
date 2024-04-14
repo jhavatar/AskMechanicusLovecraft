@@ -1,10 +1,13 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.realm)
 }
 
 android {
-    namespace 'io.chthonic.rigkmortychars.domain.dataapi'
+    namespace 'io.chthonic.mechanicuslovecraft.chatrepo.realm'
     compileSdk versions.targetSdk
 
     defaultConfig {
@@ -26,11 +29,23 @@ android {
 
 dependencies {
     implementation libs.androidx.core
-    implementation project(path: ':common')
+    implementation project(path: ':data:common')
+    implementation project(path: ':domain:dataapi')
+
+    // di
+    implementation libs.hilt.android
+    ksp libs.hilt.android.compiler
+
+    // coroutines, flow
+    implementation libs.coroutines.core
+    implementation libs.coroutines.android
+
+    // db
+    implementation libs.realm.base
 
     // paging
     implementation libs.paging.runtime
 
-    // testing
+    // test
     testImplementation libs.junit
 }
