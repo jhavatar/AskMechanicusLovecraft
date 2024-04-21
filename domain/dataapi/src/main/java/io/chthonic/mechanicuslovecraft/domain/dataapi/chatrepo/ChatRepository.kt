@@ -5,7 +5,7 @@ import io.chthonic.mechanicuslovecraft.domain.dataapi.models.ChatMessageRecord
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-    fun observeMessages() : Flow<PagingData<ChatMessageRecord>>
+    fun observePagedMessages() : Flow<PagingData<ChatMessageRecord>>
 
     suspend fun nextMessageIndex(): Long
 

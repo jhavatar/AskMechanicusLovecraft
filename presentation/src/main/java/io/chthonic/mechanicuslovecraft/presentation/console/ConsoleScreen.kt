@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,14 +29,17 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import io.chthonic.mechanicuslovecraft.presentation.R
 import io.chthonic.mechanicuslovecraft.presentation.console.widgets.MessageItemView
 import io.chthonic.mechanicuslovecraft.presentation.ktx.collectAsStateLifecycleAware
 import io.chthonic.mechanicuslovecraft.presentation.ktx.items
+import io.chthonic.mechanicuslovecraft.presentation.theme.AppTheme
 import io.chthonic.mechanicuslovecraft.presentation.theme.DraculaBlack
 import io.chthonic.mechanicuslovecraft.presentation.theme.DraculaDarkerPurple
+import kotlinx.coroutines.flow.emptyFlow
 import timber.log.Timber
-import kotlin.coroutines.CoroutineContext
 
 private const val TEXT_SIZE = 16
 private const val SMALL_MARGIN = 8
@@ -49,44 +53,37 @@ internal fun ConsoleScreen(
         initial = ConsoleViewModel.State(),
         scope = viewModel.viewModelScope
     ).value
-    Timber.v("D3V ConsoleScreen, state = $state")
+    Timber.v("D3V ConsoleScreen, state updated")// = $state")
     TerminalContent(
-        viewModel.viewModelScope.coroutineContext,
         state,
         onTextChanged = viewModel::onTextChanged,
         onInputSubmitted = viewModel::onInputSubmitted
     )
 }
 
-//@Preview
-//@Composable
-//private fun PreviewTerminalContent() {
-//    AppTheme(isDarkTheme = false) {
-//        TerminalContent(
-//            ConsoleViewModel.State(
-////                history = listOf(
-////                    HistoryItem.InputHistory("GET X"),
-////                    HistoryItem.OutputHistory("123", isError = false),
-////                    HistoryItem.InputHistory("Get Y"),
-////                    HistoryItem.OutputHistory("key not set", isError = true)
-////                ),
-//                inputTextToDisplay = "",
-//                inputSubmitEnabled = true
-//            ),
-//            onTextChanged = {},
-//            onInputSubmitted = {}
-//        )
-//    }
-//}
+@Preview
+@Composable
+private fun PreviewTerminalContent() {
+    AppTheme(isDarkTheme = false) {
+        TerminalContent(
+            ConsoleViewModel.State(
+                messages = emptyFlow(),
+                inputTextToDisplay = "",
+                inputSubmitEnabled = true
+            ),
+            onTextChanged = {},
+            onInputSubmitted = {}
+        )
+    }
+}
 
 @Composable
 private fun TerminalContent(
-    coroutineContext: CoroutineContext,
     state: ConsoleViewModel.State,
     onTextChanged: (String) -> Unit,
     onInputSubmitted: () -> Unit,
 ) {
-    Timber.v("D3V: TerminalContent")
+//    Timber.v("D3V: TerminalContent")
     val inputBarMargin = SMALL_MARGIN.dp
     ConstraintLayout(
         modifier = Modifier
@@ -137,10 +134,7 @@ private fun TerminalContent(
         )
 
         OutputView(
-            state.messages.collectAsStateLifecycleAware(
-                initial = emptyList(),
-                context = coroutineContext,
-            ).value,
+            state.messages.collectAsLazyPagingItems(),
             Modifier.constrainAs(output) {
                 top.linkTo(parent.top)
                 bottom.linkTo(inputBar.top)
@@ -155,10 +149,10 @@ private fun TerminalContent(
 
 @Composable
 private fun OutputView(
-    lazyItems: List<MessageItem>,
+    lazyItems: LazyPagingItems<MessageItem>,
     modifier: Modifier
 ) {
-    Timber.v("D3V:OutputView, size = ${lazyItems.size}")
+//    Timber.v("D3V:OutputView, size = ${lazyItems.itemCount}")
     val lazyColumnListState = rememberLazyListState()
     LazyColumn(
         reverseLayout = true,
@@ -184,9 +178,9 @@ private fun OutputView(
         }
     }
 
-    LaunchedEffect(lazyItems.size) {
-        // auto scroll to bottom of output
-        if (lazyItems.isNotEmpty()) {
+    if (lazyItems.itemCount > 0) {
+        LaunchedEffect(lazyItems.peek(0)) {
+            // auto scroll to bottom of output where the first item (index 0) is displayed
             lazyColumnListState.scrollToItem(0)
         }
     }

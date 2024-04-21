@@ -2,13 +2,13 @@ package io.chthonic.mechanicuslovecraft.presentation.console
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.chthonic.mechanicuslovecraft.common.valueobjects.Role
-import io.chthonic.mechanicuslovecraft.domain.presentationapi.ObserveChatHistoryUseCase
-import io.chthonic.mechanicuslovecraft.domain.presentationapi.ObserveAllMessagesUseCase
+import io.chthonic.mechanicuslovecraft.domain.presentationapi.ObserveAllMessagePagedUseCase
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.SubmitMessageAndObserveStreamingResponseUseCase
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.models.InputString
-import io.chthonic.mechanicuslovecraft.domain.presentationapi.openai.TestOpenAiUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,31 +25,25 @@ private const val COLOR_AI: Long = 0xFFFA84C6
 
 @HiltViewModel
 internal class ConsoleViewModel constructor(
-    private val testOpenAiUseCase: TestOpenAiUseCase,
-    private val observeChatHistoryUseCase: ObserveChatHistoryUseCase,
     private val submitMessageAndObserveStreamingResponseUseCase: SubmitMessageAndObserveStreamingResponseUseCase,
-    private val observeAllMessagesUseCase: ObserveAllMessagesUseCase,
+    private val observeAllMessagePagedUseCase: ObserveAllMessagePagedUseCase,
     initStateState: State,
 ) : ViewModel() {
 
     @Inject
     constructor(
-        testOpenAiUseCase: TestOpenAiUseCase,
-        observeChatHistoryUseCase: ObserveChatHistoryUseCase,
         submitMessageAndObserveStreamingResponseUseCase: SubmitMessageAndObserveStreamingResponseUseCase,
-        observeAllMessagesUseCase: ObserveAllMessagesUseCase,
+        observeAllMessagePagedUseCase: ObserveAllMessagePagedUseCase,
     ) : this(
-        testOpenAiUseCase,
-        observeChatHistoryUseCase,
         submitMessageAndObserveStreamingResponseUseCase,
-        observeAllMessagesUseCase,
+        observeAllMessagePagedUseCase,
         State(),
     )
 
     data class State(
         val inputTextToDisplay: String = "",
         val inputSubmitEnabled: Boolean = true,
-        val messages: Flow<List<MessageItem>> = emptyFlow(),
+        val messages: Flow<PagingData<MessageItem>> = emptyFlow(),
     )
 
     private val _state = MutableStateFlow(initStateState)
@@ -58,8 +52,8 @@ internal class ConsoleViewModel constructor(
     init {
         viewModelScope.launch {
             _state.value = state.value.copy(
-                messages = observeAllMessagesUseCase.execute().map { lazyList ->
-                    lazyList.map {
+                messages = observeAllMessagePagedUseCase.execute().map { pagingData ->
+                    pagingData.map {
                         when (it.role) {
                             Role.User -> MessageItem.Input(
                                 index = it.index,
@@ -78,13 +72,13 @@ internal class ConsoleViewModel constructor(
     }
 
     fun onTextChanged(text: String) {
-        Timber.v("D3V: onInputSubmitted, text = $text currentSate = ${state.value}")
+//        Timber.v("D3V: onInputSubmitted, text = $text currentSate = ${state.value}")
         _state.value = state.value.copy(inputTextToDisplay = text)
     }
 
     fun onInputSubmitted() {
         val currentSate = state.value
-        Timber.v("D3V: onInputSubmitted, currentSate = $currentSate")
+        Timber.v("D3V: onInputSubmitted")//, currentSate = $currentSate")
         if (!currentSate.inputSubmitEnabled) return
         InputString.validateOrNull(currentSate.inputTextToDisplay)?.let { input ->
             _state.value = currentSate.copy(

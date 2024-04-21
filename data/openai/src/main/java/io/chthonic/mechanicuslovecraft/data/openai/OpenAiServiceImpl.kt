@@ -160,7 +160,7 @@ internal class OpenAiServiceImpl @Inject constructor(
                 }
 
                 override fun onClosed(eventSource: EventSource) {
-                    Timber.v("D3V: EventSourceListener.onClosed")
+//                    Timber.v("D3V: EventSourceListener.onClosed")
                     closeCallbackFlow()
                 }
 
@@ -169,7 +169,7 @@ internal class OpenAiServiceImpl @Inject constructor(
                     t: Throwable?,
                     response: Response?
                 ) {
-                    Timber.w("D3V: EventSourceListener.onFailure, t  = $t, response = $response")
+//                    Timber.w("D3V: EventSourceListener.onFailure, t  = $t, response = $response")
                     closeCallbackFlow(t)
                 }
             }
