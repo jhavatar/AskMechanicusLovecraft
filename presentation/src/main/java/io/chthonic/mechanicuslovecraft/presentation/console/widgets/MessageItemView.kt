@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.chthonic.mechanicuslovecraft.presentation.console.MessageItem
-import timber.log.Timber
 
 private const val TEXT_SIZE = 16
 
@@ -24,7 +23,7 @@ fun MessageItemView(
     messageItem: MessageItem,
     onClick: () -> Unit
 ) {
-    Timber.v("D3V: MessageItemView, messageItem = $messageItem")
+//    Timber.v("D3V: MessageItemView, messageItem = $messageItem")
     Column(
         Modifier
             .padding(PaddingValues(start = 16.dp, top = 8.dp, bottom = 4.dp, end = 8.dp))

@@ -10,7 +10,6 @@ import io.chthonic.mechanicuslovecraft.domain.presentationapi.models.InputString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
-import timber.log.Timber
 import javax.inject.Inject
 
 private val SYSTEM_META_INFO =
@@ -41,9 +40,7 @@ internal class ObserveStreamingResponseToMessageUseCaseImpl @Inject constructor(
         }.onCompletion {
             chatRepository.insertMessage(
                 ChatMessageRecord(
-                    index = chatRepository.nextMessageIndex().also {
-                        Timber.v("D3V: execute, nextMessageIndex = $it")
-                    },
+                    index = chatRepository.nextMessageIndex(),
                     created = created,
                     value = ChatMessage(
                         role = role,

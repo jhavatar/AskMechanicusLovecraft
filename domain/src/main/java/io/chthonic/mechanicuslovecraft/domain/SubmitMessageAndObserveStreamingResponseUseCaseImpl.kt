@@ -8,7 +8,6 @@ import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.OpenAiService
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.SubmitMessageAndObserveStreamingResponseUseCase
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.models.InputString
 import kotlinx.coroutines.flow.firstOrNull
-import timber.log.Timber
 import javax.inject.Inject
 
 private val SYSTEM_META_INFO =
@@ -50,8 +49,6 @@ internal class SubmitMessageAndObserveStreamingResponseUseCaseImpl @Inject const
         chatHistory: List<ChatMessage>? = null
     ) {
         val stringBuilder = StringBuilder("")
-        var created: Int = (System.currentTimeMillis() / 1000L).toInt()
-        var role: Role = Role.Assistant
         openAiService.observeStreamingResponseToChat(
             messageHistory = (chatHistory ?: emptyList()) + listOf(
                 ChatMessage(
@@ -61,10 +58,10 @@ internal class SubmitMessageAndObserveStreamingResponseUseCaseImpl @Inject const
             ),
             systemMetaInfo = SYSTEM_META_INFO,
         ).collect {
-            created = it.created
-            role = it.role
+            val created = it.created
+            val role = it.role
             stringBuilder.append(it.content)
-            Timber.v("D3V: observeResponse chunk = $it")
+//            Timber.v("D3V: observeResponse chunk = $it")
 
             chatRepository.insertMessage(
                 ChatMessageRecord(
@@ -77,6 +74,6 @@ internal class SubmitMessageAndObserveStreamingResponseUseCaseImpl @Inject const
                 )
             )
         }
-        Timber.v("D3V: observeResponse done")
+//        Timber.v("D3V: observeResponse done")
     }
 }
