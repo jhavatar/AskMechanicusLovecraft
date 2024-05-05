@@ -169,7 +169,6 @@ internal class OpenAiServiceImpl @Inject constructor(
                     t: Throwable?,
                     response: Response?
                 ) {
-//                    Timber.w("D3V: EventSourceListener.onFailure, t  = $t, response = $response")
                     closeCallbackFlow(t)
                 }
             }

@@ -8,6 +8,7 @@ import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.OpenAiService
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.SubmitMessageAndObserveStreamingResponseUseCase
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.models.InputString
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
 private val SYSTEM_META_INFO =
@@ -49,6 +50,8 @@ internal class SubmitMessageAndObserveStreamingResponseUseCaseImpl @Inject const
         chatHistory: List<ChatMessage>? = null
     ) {
         val stringBuilder = StringBuilder("")
+        var created: Int = (System.currentTimeMillis() / 1000L).toInt()
+        var role: Role = Role.Assistant
         openAiService.observeStreamingResponseToChat(
             messageHistory = (chatHistory ?: emptyList()) + listOf(
                 ChatMessage(
@@ -57,23 +60,34 @@ internal class SubmitMessageAndObserveStreamingResponseUseCaseImpl @Inject const
                 )
             ),
             systemMetaInfo = SYSTEM_META_INFO,
-        ).collect {
-            val created = it.created
-            val role = it.role
+        ).onCompletion {
+            chatRepository.insertMessage(
+                ChatMessageRecord(
+                    index = answerIndex,
+                    created = created,
+                    isDone = true,
+                    value = ChatMessage(
+                        role = role,
+                        content = stringBuilder.toString()
+                    ),
+                )
+            )
+        }.collect {
+            created = it.created
+            role = it.role
             stringBuilder.append(it.content)
-//            Timber.v("D3V: observeResponse chunk = $it")
 
             chatRepository.insertMessage(
                 ChatMessageRecord(
                     index = answerIndex,
                     created = created,
+                    isDone = false,
                     value = ChatMessage(
                         role = role,
-                        content = stringBuilder.toString()
-                    )
+                        content = stringBuilder.toString(),
+                    ),
                 )
             )
         }
-//        Timber.v("D3V: observeResponse done")
     }
 }

@@ -34,4 +34,9 @@ internal class DomainModule {
     fun provideObserveAllMessagePagedUseCase(
         impl: ObserveAllMessagePagedUseCaseImpl
     ): ObserveAllMessagePagedUseCase = impl
+
+    @Provides
+    fun provideObserveNextAssistantResponseState(
+        impl: ObserveNextAssistantResponseStateImpl,
+    ): ObserveNextAssistantResponseState = impl
 }

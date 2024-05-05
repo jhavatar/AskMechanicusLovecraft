@@ -7,8 +7,11 @@ import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.chthonic.mechanicuslovecraft.common.valueobjects.Role
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.ObserveAllMessagePagedUseCase
+import io.chthonic.mechanicuslovecraft.domain.presentationapi.ObserveNextAssistantResponseState
+import io.chthonic.mechanicuslovecraft.domain.presentationapi.ObserveNextAssistantResponseState.AssistantResponseState
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.SubmitMessageAndObserveStreamingResponseUseCase
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.models.InputString
+import io.chthonic.mechanicuslovecraft.presentation.console.ConsoleViewModel.InputCompanionWidget.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -24,9 +27,10 @@ private const val COLOR_USER: Long = 0xFFFAFA91
 private const val COLOR_AI: Long = 0xFFFA84C6
 
 @HiltViewModel
-internal class ConsoleViewModel constructor(
+internal class ConsoleViewModel(
     private val submitMessageAndObserveStreamingResponseUseCase: SubmitMessageAndObserveStreamingResponseUseCase,
     private val observeAllMessagePagedUseCase: ObserveAllMessagePagedUseCase,
+    private val observeNextAssistantResponseState: ObserveNextAssistantResponseState,
     initStateState: State,
 ) : ViewModel() {
 
@@ -34,17 +38,25 @@ internal class ConsoleViewModel constructor(
     constructor(
         submitMessageAndObserveStreamingResponseUseCase: SubmitMessageAndObserveStreamingResponseUseCase,
         observeAllMessagePagedUseCase: ObserveAllMessagePagedUseCase,
+        observeNextAssistantResponseState: ObserveNextAssistantResponseState,
     ) : this(
         submitMessageAndObserveStreamingResponseUseCase,
         observeAllMessagePagedUseCase,
+        observeNextAssistantResponseState,
         State(),
     )
 
+    enum class InputCompanionWidget {
+        SUBMIT_BUTTON, AI_PROCESSING_VIEW, AI_TALKING_VIEW
+    }
+
     data class State(
         val inputTextToDisplay: String = "",
-        val inputSubmitEnabled: Boolean = true,
+        val showInputCompanionWidget: InputCompanionWidget = SUBMIT_BUTTON,
         val messages: Flow<PagingData<MessageItem>> = emptyFlow(),
-    )
+    ) {
+        val isInputEnabled: Boolean = showInputCompanionWidget == SUBMIT_BUTTON
+    }
 
     private val _state = MutableStateFlow(initStateState)
     val state: StateFlow<State> = _state.asStateFlow()
@@ -52,55 +64,72 @@ internal class ConsoleViewModel constructor(
     init {
         viewModelScope.launch {
             _state.value = state.value.copy(
-                messages = observeAllMessagePagedUseCase.execute().map { pagingData ->
-                    pagingData.map {
-                        when (it.role) {
-                            Role.User -> MessageItem.Input(
-                                index = it.index,
-                                text = it.content,
-                            )
-
-                            else -> MessageItem.Response(
-                                index = it.index,
-                                text = it.content
-                            )
-                        }
+                messages = observeAllMessagePagedUseCase.execute()
+                    .catch {
+                        Timber.e(it, "D3V: observeAllMessagePagedUseCase failed")
                     }
-                },
+                    .map { pagingData ->
+                        pagingData.map {
+                            when (it.role) {
+                                Role.User -> MessageItem.Input(
+                                    index = it.index,
+                                    text = it.content,
+                                )
+
+                                else -> MessageItem.Response(
+                                    index = it.index,
+                                    text = it.content + if (!it.isDone) "_" else ""
+                                )
+                            }
+                        }
+                    }.also {
+                        Timber.v("D3V: init observeAllMessagePagedUseCase = $it")
+                    },
             )
         }
     }
 
     fun onTextChanged(text: String) {
-//        Timber.v("D3V: onInputSubmitted, text = $text currentSate = ${state.value}")
         _state.value = state.value.copy(inputTextToDisplay = text)
     }
 
     fun onInputSubmitted() {
         val currentSate = state.value
-        Timber.v("D3V: onInputSubmitted")//, currentSate = $currentSate")
-        if (!currentSate.inputSubmitEnabled) return
+        if (currentSate.showInputCompanionWidget != SUBMIT_BUTTON) return
         InputString.validateOrNull(currentSate.inputTextToDisplay)?.let { input ->
             _state.value = currentSate.copy(
                 inputTextToDisplay = "",
-                inputSubmitEnabled = false,
+                showInputCompanionWidget = AI_PROCESSING_VIEW,
             )
+            observeAiProcessing()
             executeCommandLineInput(input)
         }
     }
 
+    private fun observeAiProcessing() {
+        viewModelScope.launch {
+            observeNextAssistantResponseState.execute()
+                .distinctUntilChanged()
+                .catch {
+                    Timber.e(it, "observeNextAssistantResponseState failed")
+                }
+                .collect {
+                    _state.value = state.value.copy(
+                        showInputCompanionWidget = when (it) {
+                            AssistantResponseState.COMPLETED -> SUBMIT_BUTTON
+                            AssistantResponseState.RECEIVING -> AI_TALKING_VIEW
+                        }
+                    )
+                }
+        }
+    }
+
     private fun executeCommandLineInput(input: InputString) {
-        Timber.v("D3V: executeCommandLineInput ${input.text}")
         viewModelScope.launch {
             try {
                 submitMessageAndObserveStreamingResponseUseCase.execute(input)
             } catch (e: Exception) {
-                Timber.e(e, "D3V: submitMessageAndObserveStreamingResponseUseCase failed")
-            } finally {
-                Timber.v("D3V: submitMessageAndObserveStreamingResponseUseCase completed")
-                _state.value = state.value.copy(
-                    inputSubmitEnabled = true,
-                )
+                Timber.e(e, "submitMessageAndObserveStreamingResponseUseCase failed")
             }
         }
     }
@@ -132,7 +161,7 @@ sealed interface MessageItem {
 
     data class Response(override val text: String, override val index: Long) : MessageItem {
         override val color = COLOR_AI
-        override val name: String = "Adeptus Lovecraft"
+        override val name: String = "Mechanicus Lovecraft"
 
         override val formattedText: String
             get() = text

@@ -61,16 +61,20 @@ internal class RealmChatRepository @Inject constructor(
         chatMessageDao.getMaxIndex()?.let { it + 1 } ?: 0L
 
     override fun observeAllMessages(): Flow<List<ChatMessageRecord>> =
-        chatMessageDao.getAllMessages().map {
-            it.map {
-                it.toDomainModel()
+        chatMessageDao.getAllMessages()
+            .map { messageList ->
+                messageList.map { message ->
+                    message.toDomainModel()
+                }
             }
-        }
 
-    override fun observeLatestMessages(messageCount: Int): Flow<List<ChatMessageRecord>> =
-        chatMessageDao.getLatestMessages(messageCount).map {
-            it.map {
-                it.toDomainModel()
+    override fun observeLatestMessages(
+        messageCount: Int,
+    ): Flow<List<ChatMessageRecord>> =
+        chatMessageDao.getLatestMessages(messageCount)
+            .map { messageList ->
+                messageList.map {
+                    it.toDomainModel()
+                }
             }
-        }
 }
