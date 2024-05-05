@@ -12,7 +12,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -42,7 +41,6 @@ internal class ChatMessageDao @Inject constructor(
                 .sort(INDEX_FIELD_NAME, Sort.DESCENDING)
                 .asFlow()
                 .collect {
-                    Timber.v("D3V: emit to allMessages, size = ${it.list.size}")
                     _lazyLoadingMessages.emit(it.list)
                 }
         }
@@ -62,6 +60,7 @@ internal class ChatMessageDao @Inject constructor(
                 val entity = ChatMessageEntity().apply {
                     index = message.index
                     created = RealmInstant.from(message.created.toLong(), 0)
+                    isDone = message.isDone
                     role = message.value.role.value
                     content = message.value.content
                     name = message.value.name
@@ -85,9 +84,8 @@ internal class ChatMessageDao @Inject constructor(
             lazyLoadingMessages.value.let { messages ->
                 val startIndex = page * pageSize // first page index is 0
                 val endIndex = (page * pageSize + (pageSize - 1)).coerceAtMost(messages.size)
-                Timber.v("D3V: getPageOfMessages2, page = $page, pageSize = $pageSize, startIndex = $startIndex, endIndex = $endIndex")
                 if (startIndex < endIndex) {
-                    messages.subList(startIndex, endIndex + 1)
+                    messages.subList(startIndex, endIndex)
                 } else {
                     emptyList()
                 }
@@ -96,14 +94,15 @@ internal class ChatMessageDao @Inject constructor(
 
     fun getAllMessages(): Flow<List<ChatMessageEntity>> =
         realm.query(ChatMessageEntity::class)
-            .sort(INDEX_FIELD_NAME, Sort.DESCENDING)//.limit(PAGE_SIZE)
+            .sort(INDEX_FIELD_NAME, Sort.DESCENDING)
             .asFlow()
             .map {
                 it.list
             }
 
     fun getLatestMessages(messageCount: Int): Flow<List<ChatMessageEntity>> =
-        realm.query(ChatMessageEntity::class).sort(INDEX_FIELD_NAME, Sort.DESCENDING)
+        realm.query(ChatMessageEntity::class)
+            .sort(INDEX_FIELD_NAME, Sort.DESCENDING)
             .limit(messageCount)
             .asFlow()
             .map {

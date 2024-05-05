@@ -7,4 +7,5 @@ data class ChatMessage(
     val index: Long,
     val role: Role,
     val created: Int, // Unix timestamp in seconds
+    val isDone: Boolean,
 )

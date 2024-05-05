@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    <item android:drawable="@drawable/lovecraft_basic_default_frame" android:duration="200" />
+    <item android:drawable="@drawable/lovecraft_basic_think_frame" android:duration="200" />
+</animation-list>

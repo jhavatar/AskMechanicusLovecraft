@@ -17,7 +17,6 @@ internal class ChatMessagePagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ChatMessageEntity> {
         val page = params.key ?: STARTING_PAGE_INDEX
         return try {
-            Timber.v("D3V: load. page = $page, params.key = ${params.key}, params.loadSize = ${params.loadSize}, params.placeholdersEnabled = ${params.placeholdersEnabled}")
             val response = chatMessageDao.getPageOfMessages(page, params.loadSize)
             LoadResult.Page(
                 data = response,
@@ -27,6 +26,7 @@ internal class ChatMessagePagingSource(
                 )
             )
         } catch (exception: Exception) {
+            Timber.e(exception, "load, failed")
             return LoadResult.Error(exception)
         }
     }

@@ -32,6 +32,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import io.chthonic.mechanicuslovecraft.presentation.R
+import io.chthonic.mechanicuslovecraft.presentation.console.ConsoleViewModel.InputCompanionWidget.*
+import io.chthonic.mechanicuslovecraft.presentation.console.widgets.AiProcessingView
+import io.chthonic.mechanicuslovecraft.presentation.console.widgets.AiTalkingView
 import io.chthonic.mechanicuslovecraft.presentation.console.widgets.MessageItemView
 import io.chthonic.mechanicuslovecraft.presentation.ktx.collectAsStateLifecycleAware
 import io.chthonic.mechanicuslovecraft.presentation.ktx.items
@@ -53,7 +56,7 @@ internal fun ConsoleScreen(
         initial = ConsoleViewModel.State(),
         scope = viewModel.viewModelScope
     ).value
-    Timber.v("D3V ConsoleScreen, state updated")// = $state")
+    Timber.v("D3V ConsoleScreen, state updated, messages = ${state.messages}")// = $state")
     TerminalContent(
         state,
         onTextChanged = viewModel::onTextChanged,
@@ -69,7 +72,7 @@ private fun PreviewTerminalContent() {
             ConsoleViewModel.State(
                 messages = emptyFlow(),
                 inputTextToDisplay = "",
-                inputSubmitEnabled = true
+                showInputCompanionWidget = SUBMIT_BUTTON,
             ),
             onTextChanged = {},
             onInputSubmitted = {}
@@ -109,19 +112,26 @@ private fun TerminalContent(
                 .fillMaxWidth()
         )
 
-        SubmitButton(
-            state.inputSubmitEnabled,
-            Modifier.constrainAs(submitButton) {
-                top.linkTo(barrier, inputBarMargin)
-                bottom.linkTo(parent.bottom, inputBarMargin)
-                end.linkTo(parent.end, inputBarMargin)
-            },
-            onInputSubmitted
-        )
+        val modifier = Modifier.constrainAs(submitButton) {
+            top.linkTo(barrier, inputBarMargin)
+            bottom.linkTo(parent.bottom, inputBarMargin)
+            end.linkTo(parent.end, inputBarMargin)
+        }
+        when (state.showInputCompanionWidget) {
+            SUBMIT_BUTTON ->
+                SubmitButton(
+                    state.isInputEnabled,
+                    modifier,
+                    onInputSubmitted
+                )
+
+            AI_PROCESSING_VIEW -> AiProcessingView(modifier = modifier)
+            AI_TALKING_VIEW -> AiTalkingView(modifier = modifier)
+        }
 
         InputText(
             state.inputTextToDisplay,
-            state.inputSubmitEnabled,
+            state.isInputEnabled,
             Modifier.constrainAs(inputText) {
                 top.linkTo(barrier, inputBarMargin)
                 bottom.linkTo(parent.bottom, inputBarMargin)
@@ -152,7 +162,6 @@ private fun OutputView(
     lazyItems: LazyPagingItems<MessageItem>,
     modifier: Modifier
 ) {
-//    Timber.v("D3V:OutputView, size = ${lazyItems.itemCount}")
     val lazyColumnListState = rememberLazyListState()
     LazyColumn(
         reverseLayout = true,

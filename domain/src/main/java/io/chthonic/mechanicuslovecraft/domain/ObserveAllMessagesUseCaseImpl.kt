@@ -12,9 +12,9 @@ internal class ObserveAllMessagesUseCaseImpl @Inject constructor(private val cha
     ObserveAllMessagesUseCase {
 
     override fun execute(): Flow<List<ChatMessage>> =
-        chatRepository.observeAllMessages().map {
-            it.map {
-                it.toPresentationModel()
+        chatRepository.observeAllMessages().map { messageList ->
+            messageList.map { message ->
+                message.toPresentationModel()
             }
         }
 }

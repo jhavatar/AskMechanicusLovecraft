@@ -16,15 +16,17 @@ class ChatMessageEntity() : RealmObject {
     var role: String = ""
     var content: String = ""
     var name: String? = null
+    var isDone: Boolean = true
 
     fun toDomainModel() =
         ChatMessageRecord(
             index = index,
             created = created.epochSeconds.toInt(),
+            isDone = isDone,
             value = ChatMessage(
                 role = Role.validate(role),
                 content = content,
                 name = name
-            )
+            ),
         )
 }
