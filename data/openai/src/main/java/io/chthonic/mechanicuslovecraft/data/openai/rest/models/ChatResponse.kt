@@ -7,7 +7,7 @@ internal data class ChatResponse(
     val id: String,
     val created: Int,
     val model: Model,
-    val system_fingerprint: String,
+    val system_fingerprint: String?,
     val `object`: String,
     val choices: List<Choice>,
     val usage: Usage,

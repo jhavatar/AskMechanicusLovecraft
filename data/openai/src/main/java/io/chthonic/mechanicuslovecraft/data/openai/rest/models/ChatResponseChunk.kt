@@ -7,7 +7,7 @@ internal data class ChatResponseChunk(
     val id: String,
     val created: Int,
     val model: Model,
-    val system_fingerprint: String,
+    val system_fingerprint: String?,
     val `object`: String,
     val choices: List<ChoiceChunk>,
 )
