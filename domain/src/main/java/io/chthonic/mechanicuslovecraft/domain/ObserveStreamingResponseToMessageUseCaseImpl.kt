@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
-private val SYSTEM_META_INFO =
+private const val SYSTEM_META_INFO =
     "Pretend to be HP Lovecraft that is also a member of the Adeptus Mechanicus and respond to all question as he might"
 
 internal class ObserveStreamingResponseToMessageUseCaseImpl @Inject constructor(

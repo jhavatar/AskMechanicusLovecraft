@@ -9,7 +9,7 @@ Project for playing around with:
 
 ## Demo (commit [31907fe](https://github.com/jhavatar/AskMechanicusLovecraft/commit/31907fedf20ce72fe7019409813ac8c7a3720c0d))
 <div align="center">
-  <video src="https://github.com/jhavatar/AskMechanicusLovecraft/assets/10738882/16721c46-aa02-4657-b2a6-ea2f601dc40d"/>
+  <video src="https://github.com/jhavatar/AskMechanicusLovecraft/assets/10738882/16721c46-aa02-4657-b2a6-ea2f601dc40d"></video>
 </div>
 
 ## Before you build

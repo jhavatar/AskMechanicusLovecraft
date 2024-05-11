@@ -1,10 +1,10 @@
 [versions]
 agp = "8.2.2"
-androidx-core = '1.12.0'
+androidx-core = '1.13.1'
 androidx-test-ext-junit = "1.1.5"
 appcompat = "1.6.1"
 coil = '2.5.0'
-compose = '1.6.5'
+compose = '1.6.7'
 compose_constraintlayout = '1.0.1'
 coroutines = '1.8.0'
 espresso-core = "3.5.1"
@@ -14,15 +14,13 @@ junit = '4.13.2'
 kotlin = "1.9.22"
 ksp = "1.9.22-1.0.18"
 lifecycle = '2.7.0'
-material = "1.11.0"
+material = "1.12.0"
 moshi = '1.15.1'
 navigation = '2.7.7'
 okhttp = '4.12.0'
 paging = '3.2.1'
 retrofit = '2.10.0'
 realm = '1.14.1'
-room = '2.6.1'
-room-paging = '2.6.1'
 timber = '5.0.1'
 tweaks = "3.1.0"
 
@@ -37,11 +35,6 @@ hilt-navigation_compose = { module = "androidx.hilt:hilt-navigation-compose", ve
 
 # logging
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-
-# room
-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-room = { module = "androidx.room:room-ktx", version.ref = "room" }
-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 # json
 moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
@@ -61,7 +54,6 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 # paging
 paging-runtime = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
-paging-room = { module = "androidx.room:room-paging", version.ref = "room-paging" }
 
 # coroutines, flow
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
