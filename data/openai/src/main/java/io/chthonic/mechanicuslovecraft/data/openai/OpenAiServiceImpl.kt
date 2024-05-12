@@ -5,10 +5,15 @@ import com.squareup.moshi.Moshi
 import io.chthonic.mechanicuslovecraft.common.coroutines.CoroutineDispatcherProvider
 import io.chthonic.mechanicuslovecraft.common.valueobjects.Role
 import io.chthonic.mechanicuslovecraft.data.openai.rest.OpenAiApi
-import io.chthonic.mechanicuslovecraft.data.openai.rest.models.*
+import io.chthonic.mechanicuslovecraft.data.openai.rest.models.ChatRequest
+import io.chthonic.mechanicuslovecraft.data.openai.rest.models.ChatResponseChunk
+import io.chthonic.mechanicuslovecraft.data.openai.rest.models.Message
+import io.chthonic.mechanicuslovecraft.domain.dataapi.localconfig.LocalConfigRepo
 import io.chthonic.mechanicuslovecraft.domain.dataapi.models.ChatMessage
 import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.OpenAiService
 import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.models.ChatResponseStreamChunk
+import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.models.GptModel
+import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.models.toGptModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
@@ -36,6 +41,7 @@ internal class OpenAiServiceImpl @Inject constructor(
     private val openAiApi: OpenAiApi,
     @Named("okhttp-openai") private val client: OkHttpClient,
     @Named("moshi-openai") private val moshi: Moshi,
+    private val localConfigRepo: LocalConfigRepo,
     coroutineDispatcherProvider: CoroutineDispatcherProvider,
 ) : OpenAiService {
 
@@ -43,7 +49,13 @@ internal class OpenAiServiceImpl @Inject constructor(
         CoroutineScope(coroutineDispatcherProvider.io + Job())
 
     override suspend fun testChatResponse() {
-        val response = getChatResponse()
+        val response = openAiApi.getChatResponse(
+            buildChatRequest(
+                "Say this is a test!",
+                model = localConfigRepo.getValue(LocalConfigRepo.ConfigValue.OpenAiGptModel)
+                    .toGptModel(),
+            )
+        )
         Timber.v("D3V: testChatResponse, response = $response")
     }
 
@@ -53,7 +65,9 @@ internal class OpenAiServiceImpl @Inject constructor(
                 buildChatRequest(
                     message = "Say this is a test!",
                     stream = true,
-                )
+                    model = localConfigRepo.getValue(LocalConfigRepo.ConfigValue.OpenAiGptModel)
+                        .toGptModel(),
+                ),
             ).collect {
                 Timber.v("D3V: testStreamChatResponse, response chunk = $it")
             }
@@ -63,7 +77,7 @@ internal class OpenAiServiceImpl @Inject constructor(
     private fun buildChatRequest(
         message: String,
         systemMetaInfo: String? = null,
-        model: Model = Model.GPT35_TURBO,
+        model: GptModel,
         stream: Boolean = false,
     ): ChatRequest = buildChatRequest(
         messageHistory = listOf(
@@ -80,7 +94,7 @@ internal class OpenAiServiceImpl @Inject constructor(
     private fun buildChatRequest(
         messageHistory: List<Message>,
         systemMetaInfo: String? = null,
-        model: Model = Model.GPT35_TURBO,
+        model: GptModel,
         stream: Boolean = false,
     ): ChatRequest = ChatRequest(
         messages = messageHistory + (systemMetaInfo?.let {
@@ -95,10 +109,7 @@ internal class OpenAiServiceImpl @Inject constructor(
         stream = stream,
     )
 
-    private suspend fun getChatResponse(): ChatResponse =
-        openAiApi.getChatResponse(buildChatRequest("Say this is a test!"))
-
-    override fun observeStreamingResponseToChat(
+    override suspend fun observeStreamingResponseToChat(
         messageHistory: List<ChatMessage>,
         systemMetaInfo: String?,
     ): Flow<ChatResponseStreamChunk> {
@@ -112,7 +123,9 @@ internal class OpenAiServiceImpl @Inject constructor(
                     )
                 },
                 systemMetaInfo = systemMetaInfo,
-                stream = true
+                model = localConfigRepo.getValue(LocalConfigRepo.ConfigValue.OpenAiGptModel)
+                    .toGptModel(),
+                stream = true,
             )
         ).mapNotNull { chunk ->
             chunk.choices.firstOrNull()?.delta?.let { delta ->

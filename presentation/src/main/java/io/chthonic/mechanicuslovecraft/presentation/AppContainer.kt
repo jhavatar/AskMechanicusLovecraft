@@ -1,34 +1,57 @@
 package io.chthonic.mechanicuslovecraft.presentation
 
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import io.chthonic.mechanicuslovecraft.presentation.ktx.collectAsStateLifecycleAware
 import io.chthonic.mechanicuslovecraft.presentation.theme.DraculaPurple
+
+private const val LABEL_BACK = "Back"
+private const val LABEL_SETTINGS = "Settings"
 
 @Preview
 @Composable
 fun AppContainer() {
     val appContainerState = rememberAppContainerState()
-    val coroutineScope = rememberCoroutineScope()
-    val appTitle = stringResource(R.string.app_name)
-    LaunchedEffect(appTitle) {
-        appContainerState.updateAppBarTitle(appTitle)
-    }
     Scaffold(
         scaffoldState = appContainerState.scaffoldState,
         topBar = {
             // your top bar
-            val appBarTitle = appContainerState.showAppBarTitle.collectAsStateLifecycleAware(
-                initial = null,
-                scope = coroutineScope
-            )
-            TopAppBar(title = { Text(appBarTitle.value ?: "", color = DraculaPurple) })
+            TopAppBar(
+                title = {
+                    Text(
+                        appContainerState.appBarState.value.appBarTitle,
+                        color = DraculaPurple,
+                    )
+                },
+                navigationIcon = if (appContainerState.appBarState.value.showBackButton) {
+                    {
+                        IconButton(onClick = { appContainerState.navController.navigateUp() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                tint = DraculaPurple,
+                                contentDescription = LABEL_BACK,
+                            )
+                        }
+                    }
+                } else {
+                    null
+                },
+                actions = {
+                    if (appContainerState.appBarState.value.showSettingsButton) {
+                        IconButton(onClick = {
+                            appContainerState.navigateToSettings()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Settings,
+                                tint = DraculaPurple,
+                                contentDescription = LABEL_SETTINGS,
+                            )
+                        }
+                    }
+                })
         },
         floatingActionButton = {
             // your floating action button
@@ -38,7 +61,7 @@ fun AppContainer() {
             // your page content
             AppContainerNavHost(
                 appContainerState = appContainerState,
-                padding = padding
+                padding = padding,
             )
         },
         bottomBar = {

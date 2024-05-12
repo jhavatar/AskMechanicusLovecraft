@@ -7,8 +7,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.chthonic.mechanicuslovecraft.data.openai.rest.OpenAiApi
 import io.chthonic.mechanicuslovecraft.data.openai.rest.OpenAiHeadersInterceptor
-import io.chthonic.mechanicuslovecraft.data.openai.rest.models.Model
-import io.chthonic.mechanicuslovecraft.data.openai.rest.models.ModelJsonAdapter
+import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.models.GptModel
+import io.chthonic.mechanicuslovecraft.data.openai.rest.models.GptModelJsonAdapter
 import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.OpenAiService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -33,7 +33,7 @@ internal class OpenAiSingletonModule {
     @Provides
     @Named("moshi-openai")
     fun provideMoshiForOpenAi(moshi: Moshi): Moshi = moshi.newBuilder()
-        .add(Model::class.java, ModelJsonAdapter())
+        .add(GptModel::class.java, GptModelJsonAdapter())
         .build()
 
     @Provides

@@ -16,11 +16,8 @@ internal class OpenAiHeadersInterceptor @Inject constructor(
         val apiOrganization =
             runBlocking { localConfigRepo.getValue(LocalConfigRepo.ConfigValue.OpenAiOrganization) }
         val request = original.newBuilder()
-            .header(
-                "Authorization",
-                "Bearer $apiKey"
-            )
-            .header("OpenAI-Organization", apiOrganization)
+            .header("Authorization", "Bearer $apiKey")
+            .header("OpenAI-Organization", apiOrganization ?: "")
             .build()
         return chain.proceed(request)
     }

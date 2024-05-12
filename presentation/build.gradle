@@ -77,6 +77,9 @@ dependencies {
     // logging
     implementation libs.timber
 
+    // settings
+    implementation libs.tweaks
+
     // testing
     testImplementation libs.junit
 }

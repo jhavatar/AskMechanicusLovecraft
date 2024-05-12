@@ -5,15 +5,21 @@ import com.telefonica.tweaks.Tweaks
 import com.telefonica.tweaks.domain.TweaksGraph
 import com.telefonica.tweaks.domain.tweaksGraph
 import io.chthonic.mechanicuslovecraft.domain.dataapi.localconfig.LocalConfigRepo
-import io.chthonic.mechanicuslovecraft.domain.dataapi.localconfig.LocalConfigRepo.ConfigValue.OpenAiApiKey
-import io.chthonic.mechanicuslovecraft.domain.dataapi.localconfig.LocalConfigRepo.ConfigValue.OpenAiOrganization
+import io.chthonic.mechanicuslovecraft.domain.dataapi.localconfig.LocalConfigRepo.ConfigValue.*
+import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.models.GptModel
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 internal class LocalConfigRepoImpl @Inject constructor(private val app: Application) :
     LocalConfigRepo {
-    override suspend fun initialize() {
-        Tweaks.init(app, genLocalConfigScreen())
+    override suspend fun initialize(defaultOpenAiKey: String, defaultOpenAiOrg: String) {
+        Tweaks.init(
+            app,
+            genLocalConfigScreen(
+                defaultOpenAiKey = defaultOpenAiKey,
+                defaultOpenAiOrg = defaultOpenAiOrg,
+            )
+        )
     }
 
     override suspend fun <T> getValue(configValue: LocalConfigRepo.ConfigValue<T>): T =
@@ -23,17 +29,31 @@ internal class LocalConfigRepoImpl @Inject constructor(private val app: Applicat
         Tweaks.getReference().setTweakValue(configValue.key, value)
     }
 
-    private fun genLocalConfigScreen(): TweaksGraph = tweaksGraph {
-        cover("Tweaks") {
+    private fun genLocalConfigScreen(
+        defaultOpenAiKey: String,
+        defaultOpenAiOrg: String,
+    ): TweaksGraph = tweaksGraph {
+        cover("Settings") {
             editableString(
                 key = OpenAiApiKey.key,
                 name = "OpenAi API key",
-                defaultValue = flowOf(OpenAiApiKey.defaultHardcodedValue),
+                defaultValue = flowOf(defaultOpenAiKey),
             )
             editableString(
                 key = OpenAiOrganization.key,
                 name = "OpenAi Organization",
-                defaultValue = flowOf(OpenAiOrganization.defaultHardcodedValue)
+                defaultValue = flowOf(defaultOpenAiOrg)
+            )
+            dropDownMenu(
+                key = OpenAiGptModel.key,
+                name = "GPT Model",
+                values = listOf(
+                    GptModel.GPT35_TURBO.value,
+                    GptModel.GPT4.value,
+                    GptModel.GPT4_TURBO.value,
+                    GptModel.GPT4_TURBO_PREVIEW.value
+                ),
+                defaultValue = flowOf(OpenAiGptModel.defaultHardcodedValue)
             )
         }
     }

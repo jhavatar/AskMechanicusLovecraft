@@ -20,7 +20,7 @@ internal class ObserveStreamingResponseToMessageUseCaseImpl @Inject constructor(
     private val chatRepository: ChatRepository,
 ) : ObserveStreamingResponseToMessageUseCase {
 
-    override fun execute(message: InputString): Flow<String> {
+    override suspend fun execute(message: InputString): Flow<String> {
         val stringBuilder = StringBuilder("")
         var created: Int = (System.currentTimeMillis() / 1000L).toInt()
         var role: Role = Role.Assistant
