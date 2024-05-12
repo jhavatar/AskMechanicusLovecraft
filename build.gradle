@@ -6,7 +6,7 @@ buildscript {
                 targetSdk          : 34,
                 java               : JavaVersion.VERSION_1_8,
                 jvm_target         : '1.8',
-                kotlin_compiler_ext: '1.5.10',
+                kotlin_compiler_ext: '1.5.13',
         ]
     }
 }

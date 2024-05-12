@@ -50,8 +50,14 @@ private const val BIG_MARGIN = 8
 
 @Composable
 internal fun ConsoleScreen(
-    viewModel: ConsoleViewModel = hiltViewModel()
+    viewModel: ConsoleViewModel = hiltViewModel(),
+    updateShowSettingsButton: (Boolean) -> Unit,
+    updateShowBackButton: (Boolean) -> Unit,
 ) {
+    LaunchedEffect(viewModel) {
+        updateShowSettingsButton(true)
+        updateShowBackButton(false)
+    }
     val state = viewModel.state.collectAsStateLifecycleAware(
         initial = ConsoleViewModel.State(),
         scope = viewModel.viewModelScope
