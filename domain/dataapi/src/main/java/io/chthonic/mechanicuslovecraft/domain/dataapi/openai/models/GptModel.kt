@@ -11,6 +11,8 @@ value class GptModel(val value: String) {
         val GPT4 = GptModel("gpt-4")
         val GPT4_TURBO = GptModel("gpt-4-turbo")
         val GPT4_TURBO_PREVIEW = GptModel("gpt-4-turbo-preview")
+        val GPT4_O = GptModel("gpt-4o")
+        val VALUES = listOf(GPT35_TURBO, GPT4, GPT4_TURBO, GPT4_TURBO_PREVIEW, GPT4_O)
     }
 }
 

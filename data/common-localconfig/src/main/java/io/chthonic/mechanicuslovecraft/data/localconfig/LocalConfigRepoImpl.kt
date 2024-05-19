@@ -47,12 +47,7 @@ internal class LocalConfigRepoImpl @Inject constructor(private val app: Applicat
             dropDownMenu(
                 key = OpenAiGptModel.key,
                 name = "GPT Model",
-                values = listOf(
-                    GptModel.GPT35_TURBO.value,
-                    GptModel.GPT4.value,
-                    GptModel.GPT4_TURBO.value,
-                    GptModel.GPT4_TURBO_PREVIEW.value
-                ),
+                values = GptModel.VALUES.map { it.value },
                 defaultValue = flowOf(OpenAiGptModel.defaultHardcodedValue)
             )
         }
