@@ -173,7 +173,6 @@ internal class OpenAiServiceImpl @Inject constructor(
                 }
 
                 override fun onClosed(eventSource: EventSource) {
-//                    Timber.v("D3V: EventSourceListener.onClosed")
                     closeCallbackFlow()
                 }
 
@@ -182,6 +181,14 @@ internal class OpenAiServiceImpl @Inject constructor(
                     t: Throwable?,
                     response: Response?
                 ) {
+                    // forward exception to observer
+                    this@callbackFlow.close(
+                        when {
+                            t?.message != null -> t
+                            response?.code == 401 -> RuntimeException("Unauthorized API access")
+                            else -> t ?: RuntimeException()
+                        }
+                    )
                     closeCallbackFlow(t)
                 }
             }
@@ -199,7 +206,13 @@ internal class OpenAiServiceImpl @Inject constructor(
             val eventSource = EventSources.createFactory(client)
                 .newEventSource(request = request, listener = eventSourceListener)
             coroutineScope.launch {
-                client.newCall(request).execute()
+                try {
+                    Timber.v("D3V: client.newCall")
+                    client.newCall(request).execute()
+                } catch (e: Exception) {
+                    // exception forwarded in onFailure
+                    Timber.e(e, "client.newCall failed")
+                }
             }
             awaitClose {
                 eventSource.cancel()

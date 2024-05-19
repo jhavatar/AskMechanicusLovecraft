@@ -42,7 +42,6 @@ import io.chthonic.mechanicuslovecraft.presentation.theme.AppTheme
 import io.chthonic.mechanicuslovecraft.presentation.theme.DraculaBlack
 import io.chthonic.mechanicuslovecraft.presentation.theme.DraculaDarkerPurple
 import kotlinx.coroutines.flow.emptyFlow
-import timber.log.Timber
 
 private const val TEXT_SIZE = 16
 private const val SMALL_MARGIN = 8
@@ -62,7 +61,6 @@ internal fun ConsoleScreen(
         initial = ConsoleViewModel.State(),
         scope = viewModel.viewModelScope
     ).value
-    Timber.v("D3V ConsoleScreen, state updated, messages = ${state.messages}")// = $state")
     TerminalContent(
         state,
         onTextChanged = viewModel::onTextChanged,
@@ -207,7 +205,6 @@ private fun SubmitButton(
     modifier: Modifier,
     onInputSubmitted: () -> Unit
 ) {
-    Timber.v("D3V: SubmitButton enabled = $inputSubmitEnabled")
     Button(
         onClick = onInputSubmitted,
         modifier = modifier,

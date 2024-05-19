@@ -9,4 +9,5 @@ fun ChatMessageRecord.toPresentationModel(): io.chthonic.mechanicuslovecraft.dom
         role = this.value.role,
         content = this.value.content,
         isDone = this.isDone,
+        isError = this.isError,
     )

@@ -5,4 +5,5 @@ data class ChatMessageRecord(
     val created: Int, // Unix timestamp in seconds
     val value: ChatMessage,
     val isDone: Boolean = true,
+    val isError: Boolean = false,
 )

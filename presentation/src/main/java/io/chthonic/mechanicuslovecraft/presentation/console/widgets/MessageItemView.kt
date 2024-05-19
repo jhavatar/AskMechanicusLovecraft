@@ -17,13 +17,13 @@ import androidx.compose.ui.unit.sp
 import io.chthonic.mechanicuslovecraft.presentation.console.MessageItem
 
 private const val TEXT_SIZE = 16
+private val COLOR_ERROR = Color(0xFF900C3F)
 
 @Composable
 fun MessageItemView(
     messageItem: MessageItem,
     onClick: () -> Unit
 ) {
-//    Timber.v("D3V: MessageItemView, messageItem = $messageItem")
     Column(
         Modifier
             .padding(PaddingValues(start = 16.dp, top = 8.dp, bottom = 4.dp, end = 8.dp))
@@ -39,7 +39,7 @@ fun MessageItemView(
             Text(
                 text = messageItem.formattedText,
                 fontSize = TEXT_SIZE.sp,
-                color = Color(messageItem.color),
+                color = if (messageItem.showError) COLOR_ERROR else Color(messageItem.color),
                 modifier = Modifier.padding(top = 2.dp),
             )
         }
@@ -70,6 +70,7 @@ private fun PreviewResponseMessageItemView() {
         messageItem = MessageItem.Response(
             text = "Hello World?",
             index = 51L,
+            showError = false,
         )
     ) {}
 }
