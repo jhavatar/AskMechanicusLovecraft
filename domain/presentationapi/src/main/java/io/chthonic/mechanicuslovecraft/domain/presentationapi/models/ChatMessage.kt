@@ -8,4 +8,5 @@ data class ChatMessage(
     val role: Role,
     val created: Int, // Unix timestamp in seconds
     val isDone: Boolean,
+    val isError: Boolean,
 )

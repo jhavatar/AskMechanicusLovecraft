@@ -61,6 +61,7 @@ internal class ChatMessageDao @Inject constructor(
                     index = message.index
                     created = RealmInstant.from(message.created.toLong(), 0)
                     isDone = message.isDone
+                    isError = message.isError
                     role = message.value.role.value
                     content = message.value.content
                     name = message.value.name

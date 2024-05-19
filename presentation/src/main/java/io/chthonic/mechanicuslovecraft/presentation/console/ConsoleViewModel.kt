@@ -23,7 +23,6 @@ private const val KEY_NOT_SET = "key not set"
 
 private const val COLOR_USER: Long = 0xFFFAFA91
 
-//private val COLOR_ERROR = Color.valueOf(0xFFB0E5)
 private const val COLOR_AI: Long = 0xFFFA84C6
 
 @HiltViewModel
@@ -78,7 +77,8 @@ internal class ConsoleViewModel(
 
                                 else -> MessageItem.Response(
                                     index = it.index,
-                                    text = it.content + if (!it.isDone) "_" else ""
+                                    text = (if (it.isError) "⚠\uFE0F " else "") + it.content + (if (!it.isDone) "_" else ""),
+                                    showError = it.isError,
                                 )
                             }
                         }
@@ -146,20 +146,27 @@ sealed interface MessageItem {
     val text: String
     val color: Long
     val name: String
+    val showError: Boolean
 
     val formattedText: String
 
     data class Input(
         override val text: String,
         override val index: Long,
-        override val name: String = "You"
+        override val name: String = "You",
     ) : MessageItem {
         override val color = COLOR_USER
+        override val showError: Boolean = false
         override val formattedText: String
             get() = "> $text"
     }
 
-    data class Response(override val text: String, override val index: Long) : MessageItem {
+    data class Response(
+        override val text: String,
+        override val index: Long,
+        override val showError: Boolean,
+    ) :
+        MessageItem {
         override val color = COLOR_AI
         override val name: String = "Mechanicus Lovecraft"
 

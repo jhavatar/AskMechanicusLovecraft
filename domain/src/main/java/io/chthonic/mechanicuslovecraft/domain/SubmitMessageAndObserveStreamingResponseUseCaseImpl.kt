@@ -7,6 +7,7 @@ import io.chthonic.mechanicuslovecraft.domain.dataapi.models.ChatMessageRecord
 import io.chthonic.mechanicuslovecraft.domain.dataapi.openai.OpenAiService
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.SubmitMessageAndObserveStreamingResponseUseCase
 import io.chthonic.mechanicuslovecraft.domain.presentationapi.models.InputString
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
@@ -69,6 +70,18 @@ internal class SubmitMessageAndObserveStreamingResponseUseCaseImpl @Inject const
                     value = ChatMessage(
                         role = role,
                         content = stringBuilder.toString()
+                    ),
+                )
+            )
+        }.catch {
+            chatRepository.insertMessage(
+                ChatMessageRecord(
+                    index = answerIndex,
+                    created = created,
+                    isError = true,
+                    value = ChatMessage(
+                        role = role,
+                        content = it.message ?: "Chat API call failed",
                     ),
                 )
             )
