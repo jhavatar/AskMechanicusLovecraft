@@ -9,7 +9,7 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 
 @Keep
-class ChatMessageEntity() : RealmObject {
+class ChatMessageEntity : RealmObject {
     @PrimaryKey
     var index: Long = 0
     var created: RealmInstant = RealmInstant.now()

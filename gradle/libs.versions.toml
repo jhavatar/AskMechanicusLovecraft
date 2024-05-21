@@ -1,14 +1,14 @@
 [versions]
-agp = "8.4.0"
+agp = "8.4.1"
 androidx-core = '1.13.1'
 androidx-test-ext-junit = "1.1.5"
 appcompat = "1.6.1"
-coil = '2.5.0'
+coil = "2.6.0"
 compose = '1.6.7'
 compose_constraintlayout = '1.0.1'
-coroutines = '1.8.0'
+coroutines = "1.8.1"
 espresso-core = "3.5.1"
-hilt = '2.50'
+hilt = "2.51.1"
 hilt_compose = '1.2.0'
 junit = '4.13.2'
 kotlin = "1.9.24"
@@ -19,8 +19,8 @@ moshi = '1.15.1'
 navigation = '2.7.7'
 okhttp = '4.12.0'
 paging = '3.3.0'
-retrofit = '2.10.0'
-realm = '1.14.1'
+retrofit = "2.11.0"
+realm = "1.16.0"
 timber = '5.0.1'
 tweaks = "4.0.1"
 
