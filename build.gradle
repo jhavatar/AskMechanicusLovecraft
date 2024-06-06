@@ -6,7 +6,6 @@ buildscript {
                 targetSdk          : 34,
                 java               : JavaVersion.VERSION_1_8,
                 jvm_target         : '1.8',
-                kotlin_compiler_ext: '1.5.14',
         ]
     }
 }
@@ -18,6 +17,7 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.kotlin.parcelize) apply false
     alias(libs.plugins.realm) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }
 
 tasks.register('clean', Delete) {

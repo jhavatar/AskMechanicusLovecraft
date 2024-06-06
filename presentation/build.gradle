@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -31,9 +32,6 @@ android {
     buildFeatures {
         compose true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = versions.kotlin_compiler_ext
-    }
 }
 
 dependencies {
@@ -52,6 +50,7 @@ dependencies {
     implementation libs.compose.tooling.preview
     implementation libs.compose.constraintlayout
     debugImplementation libs.compose.tooling
+    implementation libs.compose.lifecycle.runtime
 
     // navigation
     implementation libs.navigation

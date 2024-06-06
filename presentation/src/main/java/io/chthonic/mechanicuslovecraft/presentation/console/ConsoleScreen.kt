@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import io.chthonic.mechanicuslovecraft.presentation.R
@@ -36,7 +36,6 @@ import io.chthonic.mechanicuslovecraft.presentation.console.ConsoleViewModel.Inp
 import io.chthonic.mechanicuslovecraft.presentation.console.widgets.AiProcessingView
 import io.chthonic.mechanicuslovecraft.presentation.console.widgets.AiTalkingView
 import io.chthonic.mechanicuslovecraft.presentation.console.widgets.MessageItemView
-import io.chthonic.mechanicuslovecraft.presentation.ktx.collectAsStateLifecycleAware
 import io.chthonic.mechanicuslovecraft.presentation.ktx.items
 import io.chthonic.mechanicuslovecraft.presentation.theme.AppTheme
 import io.chthonic.mechanicuslovecraft.presentation.theme.DraculaBlack
@@ -57,10 +56,7 @@ internal fun ConsoleScreen(
         updateShowSettingsButton(true)
         updateShowBackButton(false)
     }
-    val state = viewModel.state.collectAsStateLifecycleAware(
-        initial = ConsoleViewModel.State(),
-        scope = viewModel.viewModelScope
-    ).value
+    val state = viewModel.state.collectAsStateWithLifecycle().value
     TerminalContent(
         state,
         onTextChanged = viewModel::onTextChanged,
